@@ -15,7 +15,8 @@ curl -X POST \
 ----
 
 Deleting is done with a POST to `/_xtdb/create-node` with the name of the name
-also given as the `node` parameter. This will delete all data on disk:
+also given as the `node` parameter. This will delete all data of this node on
+disk:
 
 [source,curl]
 ----
