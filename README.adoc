@@ -1,0 +1,36 @@
+= xtdb-http-multinode
+
+This XTDB module is based on the http-server module and adds supports for
+multiple nodes.
+
+Creating nodes can done using a POST to `/_xtdb/create-node` with the name of
+the name given as the `node` parameter:
+
+[source,curl]
+----
+curl -X POST \
+     -H "Content-Type: application/edn" \
+     -H "Accept: application/edn" \
+     -d '{:node "test"}' $XTDB_URL/_xtdb/create-node
+----
+
+Deleting is done with a POST to `/_xtdb/create-node` with the name of the name
+also given as the `node` parameter. This will delete all data on disk:
+
+[source,curl]
+----
+curl -X POST \
+     -H "Content-Type: application/edn" \
+     -H "Accept: application/edn" \
+     -d '{:node "test"}' $XTDB_URL/_xtdb/delete-node
+----
+
+The rest of the API is the same but the node name needs to be added as path
+after `_xtdb`:
+
+[source,curl]
+----
+curl -X GET \
+     -H "Accept: application/edn" \
+     $XTDB_URL/_xtdb/test/status
+----
