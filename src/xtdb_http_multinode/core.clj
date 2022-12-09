@@ -402,11 +402,13 @@
                       :get (fn [_] (resp/redirect "/_xtdb/query"))}]
                 ["/_xtdb"
                  ["/create-node" (-> {:post create-node
+                                      :muuntaja (m/create)
                                       :parameters {:body ::node-name-spec}
                                       :summary "Create Node"
                                       :description "Create new node"}
                                      (with-example "create-node"))]
                  ["/delete-node" (-> {:post delete-node
+                                      :muuntaja (m/create)
                                       :parameters {:body ::node-name-spec}
                                       :summary "Delete Node"
                                       :description "Delete node"}
