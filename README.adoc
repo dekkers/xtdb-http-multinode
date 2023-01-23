@@ -35,3 +35,19 @@ curl -X GET \
      -H "Accept: application/edn" \
      $XTDB_URL/_xtdb/test/status
 ----
+
+== configuration
+
+There following environment variables can be used with xtdb-http-multinode container
+
+=== XTDB_DISABLE_AUTO_UPGRADE
+
+Setting this variable to 1 or "true" will disable removing the indexes if an
+older XTDB index version is detected.
+
+=== XTDB_MIGRATION_NODE_NAME
+
+If the containers detects a volume that was previously used by the standard XTDB
+container it will automatically migrate that node to be the first node of the
+multinode container with the name specified by XTDB_MIGRATION_NODE_NAME. If the
+environment variable isn't specified it will default to "_dev".
