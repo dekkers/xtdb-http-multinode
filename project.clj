@@ -10,6 +10,6 @@
                  [ch.qos.logback/logback-classic "1.2.3"]
                  [org.slf4j/slf4j-api "1.7.36"]]
   :jvm-opts ["-Dlogback.configurationFile=resources/logback.xml"]
-  :main ^:skip-aot xtdb-http-multinode.core
+  :main xtdb-http-multinode.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

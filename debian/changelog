@@ -1,0 +1,5 @@
+xtdb-http-multinode (0.0.1) unstable; urgency=medium
+
+  * Package xtdb-http-multinode.
+
+ -- Jeroen Dekkers <jeroen@dekkers.ch>  Tue, 24 Jan 2023 12:23:51 +0100

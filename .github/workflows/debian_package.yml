@@ -1,0 +1,42 @@
+name: Build Debian package
+
+on: [push]
+
+jobs:
+  build-package:
+    runs-on: ubuntu-22.04
+    env:
+      PKG_NAME: xtdb-http-multinode
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get version from release tag
+        run: |
+          if [ ${GITHUB_REF_TYPE} = "tag" ]; then
+            echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
+          fi
+
+      - name: Run debian package build
+        uses: addnab/docker-run-action@v3
+        with:
+          image: debian:bullseye
+          options: -v ${{ github.workspace }}:/build --workdir /build -e RELEASE_VERSION=${{ env.RELEASE_VERSION }}
+          run: |
+            DEBIAN_FRONTEND=noninteractive apt update && apt install -y --no-install-recommends build-essential debhelper default-jdk javahelper leiningen git-buildpackage
+            export DEBFULLNAME="Jeroen Dekkers" EMAIL=jeroen@dekkers.ch
+            if [ -n "${RELEASE_VERSION}" ]; then
+              gbp dch --ignore-branch --new-version=${RELEASE_VERSION}
+            else
+              gbp dch --ignore-branch -S
+            fi
+            dpkg-buildpackage -us -uc -b -j4
+            mv ../xtdb-http-multinode_*_all.deb .
+
+      - name: Upload .deb to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: xtdb-http-multinode-debian
+          path: xtdb-http-multinode_*_all.deb

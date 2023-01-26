@@ -1,0 +1,15 @@
+[Unit]
+Description=XTDB HTTP multinode
+After=network-online.target
+
+[Service]
+Type=exec
+User=xtdb
+Group=xtdb
+WorkingDirectory=/var/lib/xtdb
+StateDirectory=xtdb
+EnvironmentFile=/etc/default/xtdb-http-multinode
+ExecStart=/usr/bin/java -Xms128M -Xmx${MAX_MEMORY} -XX:MaxDirectMemorySize=${MAX_DIRECT_MEMORY} -jar /usr/share/java/xtdb-http-multinode.jar --host ${HOST} --port ${PORT}
+
+[Install]
+WantedBy=multi-user.target

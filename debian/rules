@@ -1,0 +1,25 @@
+#!/usr/bin/make -f
+
+# lein uses ~/.lein by default
+export LEIN_HOME=$(CURDIR)/.lein
+# lein fetches dependencies online by default
+#export LEIN_OFFLINE=true
+NAME=xtdb-http-multinode
+
+%:
+	dh $@ --with javahelper
+
+override_dh_auto_build:
+# Tells lein to bundle all the relevant source code in a .jar
+	lein uberjar
+# By default, lein creates a jar with a version number in it. We symlink it so
+# we don't need a version in debian/xtdb-http-multinode.jlibs
+	cd target && ln -sf uberjar/xtdb-http-multinode-*-standalone.jar $(NAME).jar
+
+execute_after_dh_install:
+# When we switch to debhelper compat lever 14 this will be done automatically.
+	dh_installsysusers
+
+override_dh_clean:
+	rm -rf target
+	dh_clean
