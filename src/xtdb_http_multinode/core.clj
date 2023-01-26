@@ -5,6 +5,7 @@
             [clojure.java.io :as io]
             [clojure.pprint :as pp]
             [clojure.spec.alpha :as s]
+            [clojure.tools.cli :refer [parse-opts]]
             [clojure.tools.logging :as log]
             [xtdb.api :as xt]
             [xtdb.http-server.json :as http-json]
@@ -382,7 +383,10 @@
                    {"application/json" (-> (m/encode muuntaja "application/json" (make-cursors example))
                                            (m/slurp)
                                            (json/read-value))
-                    "application/edn" (with-out-str (pp/pprint example))
+                    ;; Somehow linking pprint doesn't work correctly in the the
+                    ;; Debian package, but showing the examples isn't required
+                    ;; functionality
+                    ;;"application/edn" (with-out-str (pp/pprint example))
                     "application/transit+json" (-> (m/encode muuntaja "application/transit+json" (make-cursors example))
                                                    (m/slurp)
                                                    (json/read-value))}}))))
@@ -533,14 +537,23 @@
 (defn -main
   [& args]
   (start-nodes)
-  (let [port default-server-port
-        server (j/run-jetty (rr/ring-handler (->xtdb-router {:http-options {}})
-                                             (rr/routes
-                                              (rr/create-resource-handler {:path "/"})
-                                              (rr/create-default-handler)))
-                            {:port port
-                             :h2c? true
-                             :h2? true
-                             :join? false})]
-    (log/info "HTTP server started on port: " port)
-    (->HTTPServer server {})))
+  (let [{:keys [options arguments summary errors]} (parse-opts args
+                                                               [[nil "--help" "Print this help" :default false]
+                                                                ["-h" "--host HOST" "Host to listen on" :default "0.0.0.0"]
+                                                                ["-p" "--port PORT" "Port to listen on":default default-server-port :parse-fn #(Integer. %)]])]
+    (when (:help options)
+      (println summary)
+      (System/exit 0))
+    (let [port (:port options)
+          host (:host options)
+          server (j/run-jetty (rr/ring-handler (->xtdb-router {:http-options {}})
+                                               (rr/routes
+                                                (rr/create-resource-handler {:path "/"})
+                                                (rr/create-default-handler)))
+                              {:port port
+                               :host host
+                               :h2c? true
+                               :h2? true
+                               :join? false})]
+      (log/info "HTTP server started on host" host "port" port)
+      (->HTTPServer server {}))))
