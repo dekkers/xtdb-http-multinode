@@ -27,6 +27,7 @@ jobs:
           run: |
             DEBIAN_FRONTEND=noninteractive apt update && apt install -y --no-install-recommends build-essential debhelper default-jdk javahelper leiningen git-buildpackage
             export DEBFULLNAME="Jeroen Dekkers" EMAIL=jeroen@dekkers.ch
+            git config --global --add safe.directory /build
             if [ -n "${RELEASE_VERSION}" ]; then
               gbp dch --ignore-branch --new-version=${RELEASE_VERSION}
             else
