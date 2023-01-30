@@ -15,6 +15,7 @@ Package: xtdb-http-multinode
 Architecture: all
 Depends:
  default-jre-headless,
+ rocksdb-tools,
  ${java:Depends},
  ${misc:Depends},
 Recommends:
