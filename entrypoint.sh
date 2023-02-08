@@ -13,18 +13,19 @@ xtdb_node_directories="docs
 indices
 tx-log"
 
+XTDB_DATA_DIR="${XTDB_DATA_DIR:-/var/lib/xtdb}"
 XTDB_MIGRATION_NODE_NAME="${XTDB_MIGRATION_NODE_NAME:-_dev}"
 
-if [ "$(ls /var/lib/xtdb)" = "$xtdb_node_directories" ]; then
-    mkdir "/var/lib/xtdb/$XTDB_MIGRATION_NODE_NAME"
-    mv /var/lib/xtdb/docs "/var/lib/xtdb/$XTDB_MIGRATION_NODE_NAME/documents"
-    mv /var/lib/xtdb/indices "/var/lib/xtdb/$XTDB_MIGRATION_NODE_NAME/indexes"
-    mv /var/lib/xtdb/tx-log "/var/lib/xtdb/$XTDB_MIGRATION_NODE_NAME/tx-log"
+if [ "$(ls "$XTDB_DATA_DIR")" = "$xtdb_node_directories" ]; then
+    mkdir "$XTDB_DATA_DIR/$XTDB_MIGRATION_NODE_NAME"
+    mv "$XTDB_DATA_DIR/docs" "$XTDB_DATA_DIR/$XTDB_MIGRATION_NODE_NAME/documents"
+    mv "$XTDB_DATA_DIR/indices" "$XTDB_DATA_DIR/$XTDB_MIGRATION_NODE_NAME/indexes"
+    mv "$XTDB_DATA_DIR/tx-log" "$XTDB_DATA_DIR/$XTDB_MIGRATION_NODE_NAME/tx-log"
     echo "Migrated old xtdb volume to new node $XTDB_MIGRATION_NODE_NAME"
 fi
 
 if [ "$XTDB_DISABLE_AUTO_UPGRADE" != "1" ] && [ "$XTDB_DISABLE_AUTO_UPGRADE" != "true" ]; then
-    for node in /var/lib/xtdb/*;do
+    for node in "$XTDB_DATA_DIR"/*;do
         # We check the exit code explicitly
         set +e
         index_version=$(ldb --db="$node/indexes" get --hex 0x06)
