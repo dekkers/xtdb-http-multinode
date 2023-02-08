@@ -40,6 +40,11 @@ curl -X GET \
 
 There following environment variables can be used with xtdb-http-multinode container
 
+=== XTDB_DATA_DIR
+
+This variable can be used to specify another location for XTDB instance files.
+The default value is "/var/lib/xtdb".
+
 === XTDB_DISABLE_AUTO_UPGRADE
 
 Setting this variable to 1 or "true" will disable removing the indexes if an
