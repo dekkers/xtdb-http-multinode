@@ -16,7 +16,9 @@ tx-log"
 XTDB_DATA_DIR="${XTDB_DATA_DIR:-/var/lib/xtdb}"
 XTDB_MIGRATION_NODE_NAME="${XTDB_MIGRATION_NODE_NAME:-_dev}"
 
-if [ "$(ls "$XTDB_DATA_DIR")" = "$xtdb_node_directories" ]; then
+data_dir_contents=$(ls "$XTDB_DATA_DIR")
+
+if [ "$data_dir_contents" = "$xtdb_node_directories" ]; then
     mkdir "$XTDB_DATA_DIR/$XTDB_MIGRATION_NODE_NAME"
     mv "$XTDB_DATA_DIR/docs" "$XTDB_DATA_DIR/$XTDB_MIGRATION_NODE_NAME/documents"
     mv "$XTDB_DATA_DIR/indices" "$XTDB_DATA_DIR/$XTDB_MIGRATION_NODE_NAME/indexes"
@@ -24,7 +26,7 @@ if [ "$(ls "$XTDB_DATA_DIR")" = "$xtdb_node_directories" ]; then
     echo "Migrated old xtdb volume to new node $XTDB_MIGRATION_NODE_NAME"
 fi
 
-if [ "$XTDB_DISABLE_AUTO_UPGRADE" != "1" ] && [ "$XTDB_DISABLE_AUTO_UPGRADE" != "true" ]; then
+if [ "$XTDB_DISABLE_AUTO_UPGRADE" != "1" ] && [ "$XTDB_DISABLE_AUTO_UPGRADE" != "true" ] && [ "$data_dir_contents" ] ; then
     for node in "$XTDB_DATA_DIR"/*;do
         # We check the exit code explicitly
         set +e
