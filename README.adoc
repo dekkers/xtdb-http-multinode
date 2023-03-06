@@ -56,3 +56,8 @@ If the containers detects a volume that was previously used by the standard XTDB
 container it will automatically migrate that node to be the first node of the
 multinode container with the name specified by XTDB_MIGRATION_NODE_NAME. If the
 environment variable isn't specified it will default to "_dev".
+
+=== JAVA_TOOL_OPTIONS
+
+This are the options for the JVM. This by default set to "-Xms128M -Xmx512M
+-XX:MaxDirectMemorySize=512M".

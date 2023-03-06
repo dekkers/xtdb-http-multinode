@@ -5,6 +5,7 @@ RUN lein uberjar
 
 FROM openjdk:11-jre-slim
 ENV MALLOC_ARENA_MAX=2
+ENV JAVA_TOOL_OPTIONS="-Xms128M -Xmx512M -XX:MaxDirectMemorySize=512M"
 VOLUME /var/lib/xtdb
 EXPOSE 3000
 WORKDIR /app
