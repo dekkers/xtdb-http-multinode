@@ -7,7 +7,7 @@ case "$1" in
     configure)
         # We have to check if /var/lib/xtdb exists because it is created by systemd the
         # first time XTDB is started and won't exists when package is freshly installed
-        if [ -d /var/lib/xtdb ]; then
+        if [ -d /var/lib/xtdb ] && [ "$(ls /var/lib/xtdb)" ]; then
             for node in /var/lib/xtdb/*; do
                 set +e
                 index_version=$(ldb --db="$node/indexes" get --hex 0x06)
