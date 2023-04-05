@@ -6,6 +6,7 @@ on:
     branches:
       - main
     tags:
+      - v*
 
 jobs:
   create_container_image:
