@@ -42,8 +42,15 @@ jobs:
             dpkg-buildpackage -us -uc -b -j4
             mv ../xtdb-http-multinode_*_all.deb .
 
-      - name: Upload .deb to artifacts
+      - name: Upload .deb to action artifacts
         uses: actions/upload-artifact@v3
         with:
           name: xtdb-http-multinode-debian
           path: xtdb-http-multinode_*_all.deb
+
+      - name: Upload .deb to release artificats
+        if: ${{startsWith(github.ref, 'refs/tags/') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run:
+          gh release upload ${{ github.ref_name }} xtdb-http-multinode_*_all.deb
