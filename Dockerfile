@@ -5,7 +5,7 @@ RUN lein uberjar
 
 FROM eclipse-temurin:11-jre
 ENV MALLOC_ARENA_MAX=2
-ENV JAVA_TOOL_OPTIONS="-Xms128M -Xmx512M -XX:MaxDirectMemorySize=512M"
+ENV JAVA_TOOL_OPTIONS="-Xms128M -Xmx512M -XX:MaxDirectMemorySize=512M -XX:+ExitOnOutOfMemoryError"
 VOLUME /var/lib/xtdb
 EXPOSE 3000
 WORKDIR /app
