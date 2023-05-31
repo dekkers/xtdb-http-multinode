@@ -299,6 +299,8 @@
   (io/file (or (System/getenv "XTDB_DATA_DIR") "/var/lib/xtdb")))
 
 (def nodes (atom {}))
+(def active-queries-per-node (atom {}))
+
 (defn- atom-add-node [nodes name]
   (if (get nodes name)
     ;; Node was already added, so we can just return nodes
@@ -350,18 +352,36 @@
       ;; Node is not there, so nothing to delete
       nodes
       (do
-        (.close node)
-        (run! io/delete-file (reverse (file-seq (io/file node-dir name))))
         (dissoc nodes name)))))
 
 (defn- delete-node [request]
-  (let [name (get-in request [:parameters :body :node])]
-    (if (get @nodes name)
+  (let [name (get-in request [:parameters :body :node])
+        node (get @nodes name)]
+    (if node
       (do
+        ;; We first remove the node so no new queries can be started
         (swap! nodes atom-delete-node name)
-        (log/info "Deleted node" name)
-        {:status 200, :body {:deleted true}})
+        (log/info "Removed node" name "from the list of nodes")
+        (.close node)
+        (loop []
+          (let [num-queries (get @active-queries-per-node name 0)]
+            (if (= num-queries 0)
+              (do
+                ;; No queries are running anymore so we can delete the files.
+                (run! io/delete-file (reverse (file-seq (io/file node-dir name))))
+                (log/info "Deleted files for node" name)
+                {:status 200, :body {:deleted true}})
+              (do
+                (log/info "Sleeping 100 ms because of" num-queries "active queries for node" name)
+                (Thread/sleep 100)
+                (recur))))))
       {:status 404, :body {:error "Node not found"}})))
+
+(defn- active-query-inc [active-queries name]
+  (assoc active-queries name (inc (get active-queries name 0))))
+
+(defn- active-query-dec [active-queries name]
+  (assoc active-queries name (dec (get active-queries name))))
 
 (defn- lookup-node [handler]
   (fn [request]
@@ -369,7 +389,11 @@
       (if node-name
         (let [node (get @nodes node-name)]
           (if node
-            (handler (assoc request :xtdb-node node))
+            (do
+              (swap! active-queries-per-node active-query-inc node-name)
+              (let [ret (handler (assoc request :xtdb-node node))]
+                (swap! active-queries-per-node active-query-dec node-name)
+                ret))
             {:status 404, :body {:error "Node not found"}}))
         (handler request)))))
 
