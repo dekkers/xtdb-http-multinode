@@ -199,17 +199,20 @@
       (let [{query-params :query body-params :body} (get-in req [:parameters])
             {:keys [valid-time tx-time tx-id query-edn in-args-edn in-args-json]} query-params
             query (or query-edn (get body-params :query))
-            in-args (or in-args-edn in-args-json (get body-params :in-args))]
-        (-> (if (nil? query)
-              (assoc options :no-query? true)
-              (run-query (transform-req query req)
-                         in-args
-                         (assoc options
-                                :valid-time valid-time
-                                :tx-time tx-time
-                                :tx-id tx-id
-                                :xtdb-node (get req :xtdb-node))))
-            (transform-query-resp req)))
+            in-args (or in-args-edn in-args-json (get body-params :in-args))
+            start-time (System/currentTimeMillis)
+            result (-> (if (nil? query)
+                         (assoc options :no-query? true)
+                         (run-query (transform-req query req)
+                                    in-args
+                                    (assoc options
+                                           :valid-time valid-time
+                                           :tx-time tx-time
+                                           :tx-id tx-id
+                                           :xtdb-node (get req :xtdb-node))))
+                       (transform-query-resp req))]
+        (log/debug "duration:" (- (System/currentTimeMillis) start-time) "ms query:" query)
+        result)
 
       (catch java.lang.AssertionError e
         (log/debug e)

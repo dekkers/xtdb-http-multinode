@@ -57,6 +57,10 @@ container it will automatically migrate that node to be the first node of the
 multinode container with the name specified by XTDB_MIGRATION_NODE_NAME. If the
 environment variable isn't specified it will default to "_dev".
 
+=== XTDB_QUERY_DEBUG
+
+Setting this variable will log the duration of every query.
+
 === JAVA_TOOL_OPTIONS
 
 This are the options for the JVM. This by default set to `-Xms128M -Xmx512M

@@ -568,6 +568,8 @@
     (when (:help options)
       (println summary)
       (System/exit 0))
+    (when (System/getenv "XTDB_QUERY_DEBUG")
+      (.setLevel (org.slf4j.LoggerFactory/getLogger "xtdb-http-multinode.query") (ch.qos.logback.classic.Level/valueOf "debug")))
     (let [port (:port options)
           host (:host options)
           server (j/run-jetty (rr/ring-handler (->xtdb-router {:http-options {}})
