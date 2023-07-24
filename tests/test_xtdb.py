@@ -38,11 +38,3 @@ def test_submit_tx(xtdb_node):
 
     assert entity['xt/id'] == 'boris'
     assert entity['last-name'] == 'Petrov'
-
-
-# def test_malformed(xtdb_node):
-#     edn_headers = {'Content-Type': 'application/edn', 'Accept': 'application/adn'}
-
-#     data = '{:tx-ops [[]]}'
-#     response = requests.post(f'http://127.0.0.1:3000/_xtdb/{xtdb_node}/submit-tx', headers=edn_headers, timeout=5, data=data)
-#     assert response.status_code == 200
