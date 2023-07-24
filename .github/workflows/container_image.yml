@@ -8,7 +8,8 @@ on:
     tags:
       - v*
 
-TEST_TAG: ghcr.io/dekkers/xtdb-http-multinode:test
+env:
+  TEST_TAG: ghcr.io/dekkers/xtdb-http-multinode:test
 
 jobs:
   create_container_image:
