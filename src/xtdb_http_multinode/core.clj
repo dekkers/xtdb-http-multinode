@@ -391,9 +391,10 @@
           (if node
             (do
               (swap! active-queries-per-node active-query-inc node-name)
-              (let [ret (handler (assoc request :xtdb-node node))]
-                (swap! active-queries-per-node active-query-dec node-name)
-                ret))
+              (try
+                (handler (assoc request :xtdb-node node))
+                (finally
+                 (swap! active-queries-per-node active-query-dec node-name))))
             {:status 404, :body {:error "Node not found"}}))
         (handler request)))))
 
