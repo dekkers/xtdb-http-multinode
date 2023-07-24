@@ -8,6 +8,9 @@ on:
     tags:
       - v*
 
+env:
+  TEST_TAG: ghcr.io/dekkers/xtdb-http-multinode:test
+
 jobs:
   create_container_image:
     runs-on: ubuntu-22.04
@@ -30,6 +33,30 @@ jobs:
         uses: docker/setup-buildx-action@v2
         id: buildx
 
+      - name: Build and export to local docker
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          load: true
+          tags: ${{ env.TEST_TAG }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        id: py311
+        with:
+          python-version: 3.11
+          cache: pip
+
+      - name: Install test dependencies
+        run: pip install -r tests/requirements.txt
+
+      - name: Run tests
+        run: |
+          docker run --rm --name xtdb-test -d -p 127.0.0.1:3000:3000 ${{ env.TEST_TAG }}
+          sleep 5
+          pytest
+          docker kill xtdb-test
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -37,7 +64,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build container image
+      - name: Build and push container image
         uses: docker/build-push-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
