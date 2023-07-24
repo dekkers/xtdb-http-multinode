@@ -1,5 +1,6 @@
 import random
 import string
+import time
 
 import pytest
 import requests
@@ -28,6 +29,8 @@ def test_submit_tx(xtdb_node):
 
     response = requests.post(f'http://127.0.0.1:3000/_xtdb/{xtdb_node}/submit-tx', headers=json_headers, timeout=5, data=data)
     assert response.status_code == 202
+
+    time.sleep(0.2)
 
     response = requests.get(f'http://127.0.0.1:3000/_xtdb/{xtdb_node}/entity?eid=boris', headers=json_headers, timeout=5, data=data)
     assert response.status_code == 200

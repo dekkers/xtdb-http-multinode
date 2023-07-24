@@ -53,6 +53,7 @@ jobs:
       - name: Run tests
         run: |
           docker run --rm --name xtdb-test -d -p 127.0.0.1:3000:3000 ${{ env.TEST_TAG }}
+          sleep 5
           pytest
           docker kill xtdb-test
 
