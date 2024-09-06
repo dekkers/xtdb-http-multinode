@@ -1,6 +1,7 @@
 name: Create container image
 
 on:
+  merge_group:
   pull_request:
   push:
     branches:
@@ -30,18 +31,18 @@ jobs:
             type=ref,event=pr
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         id: buildx
 
       - name: Build and export to local docker
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           load: true
           tags: ${{ env.TEST_TAG }}
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         id: py311
         with:
           python-version: 3.11
@@ -65,7 +66,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push container image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -78,7 +79,7 @@ jobs:
               (
                 github.event.pull_request.head.repo.owner.login == github.event.pull_request.base.repo.owner.login &&
                 github.actor != 'dependabot[bot]'
-                )
+              )
             }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
