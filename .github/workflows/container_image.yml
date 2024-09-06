@@ -35,7 +35,7 @@ jobs:
         id: buildx
 
       - name: Build and export to local docker
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           load: true
@@ -66,7 +66,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push container image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
