@@ -305,7 +305,8 @@
   (if (get nodes name)
     ;; Node was already added, so we can just return nodes
     nodes
-    (let [node-config {:xtdb/index-store {:kv-store {:xtdb/module `rocks/->kv-store,
+    (let [config (or (System/getenv "XTDB_DATA_DIR") "/var/lib/xtdb")
+          node-config {:xtdb/index-store {:kv-store {:xtdb/module `rocks/->kv-store,
                                                      :db-dir (io/file node-dir name "indexes"),
                                                      :block-cache :xtdb.rocksdb/block-cache}}
                        :xtdb/document-store {:kv-store {:xtdb/module `rocks/->kv-store,
