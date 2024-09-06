@@ -1,6 +1,7 @@
 name: Build Debian package
 
 on:
+  merge_group:
   pull_request:
   push:
     branches:
@@ -15,7 +16,7 @@ jobs:
       PKG_NAME: xtdb-http-multinode
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
