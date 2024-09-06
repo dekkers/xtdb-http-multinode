@@ -74,7 +74,7 @@ jobs:
           context: .
           push: |
             ${{
-              github.actor !== 'dependabot[bot]'
+              github.actor != 'dependabot[bot]'
               && (github.event_name == 'push'
                   || github.event.pull_request.head.repo.owner.login == github.event.pull_request.base.repo.owner.login
             }}
