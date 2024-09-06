@@ -1,6 +1,7 @@
 name: Create container image
 
 on:
+  merge_group:
   pull_request:
   push:
     branches:
@@ -78,7 +79,7 @@ jobs:
               (
                 github.event.pull_request.head.repo.owner.login == github.event.pull_request.base.repo.owner.login &&
                 github.actor != 'dependabot[bot]'
-                )
+              )
             }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
