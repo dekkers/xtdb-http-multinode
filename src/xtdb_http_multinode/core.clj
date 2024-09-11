@@ -37,7 +37,8 @@
            [xtdb.api NodeOutOfSyncException]
            [java.io Closeable IOException]
            java.time.Duration
-           org.eclipse.jetty.server.Server)
+           org.eclipse.jetty.server.Server
+           (org.rocksdb DBOptions InfoLogLevel))
   (:gen-class))
 
 (defn- add-last-modified [response date]
@@ -301,20 +302,24 @@
 (def nodes (atom {}))
 (def active-queries-per-node (atom {}))
 
+(def rocksdb-options (DBOptions.))
+
 (defn- atom-add-node [nodes name]
   (if (get nodes name)
     ;; Node was already added, so we can just return nodes
     nodes
-    (let [config (or (System/getenv "XTDB_DATA_DIR") "/var/lib/xtdb")
-          node-config {:xtdb/index-store {:kv-store {:xtdb/module `rocks/->kv-store,
+    (let [node-config {:xtdb/index-store {:kv-store {:xtdb/module `rocks/->kv-store,
                                                      :db-dir (io/file node-dir name "indexes"),
-                                                     :block-cache :xtdb.rocksdb/block-cache}}
+                                                     :block-cache :xtdb.rocksdb/block-cache,
+                                                     :db-options rocksdb-options}}
                        :xtdb/document-store {:kv-store {:xtdb/module `rocks/->kv-store,
                                                         :db-dir (io/file node-dir name "documents")
-                                                        :block-cache :xtdb.rocksdb/block-cache}}
+                                                        :block-cache :xtdb.rocksdb/block-cache,
+                                                        :db-options rocksdb-options}}
                        :xtdb/tx-log {:kv-store {:xtdb/module `rocks/->kv-store,
                                                 :db-dir (io/file node-dir name "tx-log")
-                                                :block-cache :xtdb.rocksdb/block-cache}}
+                                                :block-cache :xtdb.rocksdb/block-cache,
+                                                :db-options rocksdb-options}}
                        :xtdb.rocksdb/block-cache {:xtdb/module `rocks/->lru-block-cache
                                                   :cache-size (* 128 1024 1024)}}]
       (log/debug "Starting node" name)
@@ -562,6 +567,14 @@
 
 (defn -main
   [& args]
+  (let [level (clojure.string/upper-case (or (System/getenv "XTDB_ROCKSDB_LOG_LEVEL") "WARN"))]
+    (when (not (some #{level} '("DEBUG", "INFO", "WARN", "ERROR", "FATAL", "HEADER")))
+      (println "XTDB_ROCKSDB_LOG_LEVEL needs to be DEBUG, INFO, WARN, ERROR, FATAL or HEADER")
+      (System/exit 1))
+    (log/info "RocksDB log level is set to" level)
+    (.setInfoLogLevel rocksdb-options (InfoLogLevel/valueOf (str level "_LEVEL"))))
+  (.setMaxLogFileSize rocksdb-options (parse-long (or (System/getenv "XTDB_ROCKSDB_LOG_MAX_FILE_SIZE") "1048576")))
+  (.setKeepLogFileNum rocksdb-options (parse-long (or (System/getenv "XTDB_ROCKSDB_LOG_FILE_NUM") "5")))
   (start-nodes)
   (let [{:keys [options arguments summary errors]} (parse-opts args
                                                                [[nil "--help" "Print this help" :default false]
@@ -570,6 +583,7 @@
     (when (:help options)
       (println summary)
       (System/exit 0))
+
     (let [port (:port options)
           host (:host options)
           server (j/run-jetty (rr/ring-handler (->xtdb-router {:http-options {}})
@@ -582,4 +596,5 @@
                                :h2? true
                                :join? false})]
       (log/info "HTTP server started on host" host "port" port)
-      (->HTTPServer server {}))))
+      (->HTTPServer server {})))
+  )
