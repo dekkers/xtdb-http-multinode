@@ -45,6 +45,19 @@ There following environment variables can be used with xtdb-http-multinode conta
 This variable can be used to specify another location for XTDB instance files.
 The default value is "/var/lib/xtdb".
 
+=== XTDB_ROCKSDB_LOG_LEVEL
+
+The RocksDB log level. This can be DEBUG, INFO, WARN, ERROR, FATAL or HEADER.
+The default is WARN.
+
+=== XTDB_ROCKSDB_LOG_MAX_FILE_SIZE
+
+The RocksDB max log file size in bytes. The default is 1048576 (1 MiB).
+
+=== XTDB_ROCKSDB_LOG_FILE_NUM
+
+The number of RocksDB log files to keep. The default is 5.
+
 === XTDB_DISABLE_AUTO_UPGRADE
 
 Setting this variable to 1 or "true" will disable removing the indexes if an
