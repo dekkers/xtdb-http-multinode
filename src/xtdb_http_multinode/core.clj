@@ -308,18 +308,19 @@
   (if (get nodes name)
     ;; Node was already added, so we can just return nodes
     nodes
-    (let [node-config {:xtdb/index-store {:kv-store {:xtdb/module `rocks/->kv-store,
+    (let [node-rocksdb-options (DBOptions. rocksdb-options)
+          node-config {:xtdb/index-store {:kv-store {:xtdb/module `rocks/->kv-store,
                                                      :db-dir (io/file node-dir name "indexes"),
                                                      :block-cache :xtdb.rocksdb/block-cache,
-                                                     :db-options rocksdb-options}}
+                                                     :db-options node-rocksdb-options}}
                        :xtdb/document-store {:kv-store {:xtdb/module `rocks/->kv-store,
                                                         :db-dir (io/file node-dir name "documents")
                                                         :block-cache :xtdb.rocksdb/block-cache,
-                                                        :db-options rocksdb-options}}
+                                                        :db-options node-rocksdb-options}}
                        :xtdb/tx-log {:kv-store {:xtdb/module `rocks/->kv-store,
                                                 :db-dir (io/file node-dir name "tx-log")
                                                 :block-cache :xtdb.rocksdb/block-cache,
-                                                :db-options rocksdb-options}}
+                                                :db-options node-rocksdb-options}}
                        :xtdb.rocksdb/block-cache {:xtdb/module `rocks/->lru-block-cache
                                                   :cache-size (* 128 1024 1024)}}]
       (log/debug "Starting node" name)
