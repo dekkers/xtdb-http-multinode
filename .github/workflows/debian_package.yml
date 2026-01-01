@@ -44,7 +44,7 @@ jobs:
             mv ../xtdb-http-multinode_*_all.deb .
 
       - name: Upload .deb to action artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: xtdb-http-multinode-debian
           path: xtdb-http-multinode_*_all.deb
